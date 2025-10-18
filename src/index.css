@@ -1,0 +1,13 @@
+@import "tailwindcss";
+
+@theme {
+  --color-maroon: #800000;
+  --color-gold: #FFD700;
+}
+
+.bg-wmsu {
+  background-image: url('/wmsu-bg-img.jpg'); 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
