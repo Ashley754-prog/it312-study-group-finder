@@ -64,7 +64,7 @@ export default function ForgotPassword() {
                   placeholder="WMSU Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mb-4 p-2 rounded bg-gray-200 focus:ring-2 focus:ring-gold"
+                  className="mb-4 p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
                 />
 
                 <button
