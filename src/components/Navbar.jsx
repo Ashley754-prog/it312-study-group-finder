@@ -12,7 +12,7 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logoutUser();
-    navigate("/");
+    navigate("/login");
   };
 
   const navItem = (path, label, Icon) => (
@@ -65,6 +65,13 @@ export default function Navbar() {
                 className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
               >
                 Account Customization
+              </button>
+
+              <button
+                onClick={() => navigate("/admin/login")}
+                className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-red-700"
+              >
+                Admin Dashboard
               </button>
 
               <button

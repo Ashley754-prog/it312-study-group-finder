@@ -13,15 +13,20 @@ import AboutPage from "./pages/AboutPage";
 import ContactsPage from "./pages/ContactsPage";
 import TermsPage from "./pages/TermsPage";
 import PoliciesPage from "./pages/PoliciesPage";
+import AdminLogin from "./pages/admin/AdminLogin.jsx";
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
+import ManageUsers from "./pages/admin/ManageUsers.jsx";
+import ManageGroups from "./pages/admin/ManageGroups.jsx";
+import Reports from "./pages/admin/Reports.jsx";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<LoginPage />} />
-        <Route path="/create-account" element={<CreateAccount />} />
+        <Route path="/" element={<CreateAccount />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/dashboard" element={<PrivateRoute> <Dashboard /> </PrivateRoute>} />
+        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/inbox" element={<InboxPage />} />
         <Route path="/create-group" element={<CreateGroupPage />} />
         <Route path="/schedules" element={<SchedulesPage />} />
@@ -31,6 +36,12 @@ function App() {
         <Route path="/contacts" element={<ContactsPage />} />
         <Route path="/terms" element={<TermsPage />} />
         <Route path="/policies" element={<PoliciesPage />} />
+
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/manage-users" element={<ManageUsers />} />
+        <Route path="/admin/manage-groups" element={<ManageGroups />} />
+        <Route path="/admin/reports" element={<Reports />} />
       </Routes>
     </Router>
   );
