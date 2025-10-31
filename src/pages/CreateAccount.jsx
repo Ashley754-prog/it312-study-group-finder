@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { loginUser } from "../utils/auth";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { GoogleLogin } from "@react-oauth/google";
+import { jwtDecode } from "jwt-decode";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
@@ -41,6 +43,17 @@ export default function CreateAccount() {
       loginUser(username); 
       navigate("/dashboard");
     }, 1200);
+  };
+
+  const handleGoogleSignUp = (credentialResponse) => {
+    const decoded = jwtDecode(credentialResponse.credential);
+    console.log("Google new user:", decoded);
+
+    setFullName(decoded.name);
+    setEmail(decoded.email);
+
+    loginUser(decoded.given_name || "GoogleUser");
+    navigate("/dashboard");
   };
 
   return (
@@ -140,9 +153,17 @@ export default function CreateAccount() {
               {loading ? "Creating..." : "Create Account"}
             </button>
 
+          <div className="my-4">
+            <p className="text-sm text-gray-500 mb-2 text-center">or</p>
+            <GoogleLogin
+              onSuccess={handleGoogleSignUp}
+              onError={() => console.log("Google Sign-Up Failed")}
+            />
+          </div>
+
             <p className="text-sm mt-4 text-gray-600 text-center">
               Already have an account?{" "}
-              <Link to="/" className="text-maroon font-semibold hover:underline">
+              <Link to="/login" className="text-maroon font-semibold hover:underline">
                 Login here
               </Link>
             </p>

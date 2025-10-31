@@ -4,10 +4,9 @@ import {
   UserGroupIcon,
   UserCircleIcon,
   CalendarDaysIcon,
-  ClockIcon
+  ClockIcon,
 } from "@heroicons/react/24/outline";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import PageLayout from "../components/PageLayout";
 
 export default function InboxPage() {
   const [selectedChat, setSelectedChat] = useState("Group 1");
@@ -26,18 +25,12 @@ export default function InboxPage() {
   const info = {
     description: "Math 101 exam reviewer group to strengthen fundamentals.",
     meeting: "Oct 30 • 2:00 PM - 4:00 PM",
-    members: ["Juan (You)", "Maria", "Pedro", "Anna"]
+    members: ["Juan (You)", "Maria", "Pedro", "Anna"],
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-center pt-24 pb-20"
-      style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}
-    >
-      <Navbar />
-
-      <div className="flex h-[calc(100vh-160px)] max-w-7xl mx-auto bg-white bg-opacity-95 shadow-xl rounded-xl overflow-hidden">
-
-
+    <PageLayout>
+      <div className="flex h-[calc(100vh-200px)] max-w-7xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden">
         <aside className="w-64 bg-maroon text-white p-4 flex flex-col">
           <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
             <UserGroupIcon className="w-6 h-6" /> Study Groups
@@ -55,7 +48,6 @@ export default function InboxPage() {
                 }`}
               >
                 <span>{group.name}</span>
-
                 {group.unread > 0 && selectedChat !== group.name && (
                   <span className="ml-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                     {group.unread}
@@ -97,7 +89,6 @@ export default function InboxPage() {
         </main>
 
         <aside className="w-80 bg-gray-100 p-4 border-l flex flex-col justify-between">
-
           <div>
             <h3 className="font-semibold text-maroon text-lg mb-3">Group Info</h3>
             <p className="text-gray-700 text-sm mb-4">{info.description}</p>
@@ -107,14 +98,14 @@ export default function InboxPage() {
                 <CalendarDaysIcon className="w-5 h-5" />
                 <span>Next Meeting</span>
               </div>
-
               <div className="flex items-center gap-2 text-gray-700">
                 <ClockIcon className="w-5 h-5 text-maroon" />
                 <span>{info.meeting}</span>
               </div>
-
               <button
-                onClick={() => navigator.clipboard.writeText("https://meet.google.com/example")}
+                onClick={() =>
+                  navigator.clipboard.writeText("https://meet.google.com/example")
+                }
                 className="mt-2 w-full bg-maroon text-white px-3 py-2 rounded-lg hover:brightness-110 text-sm"
               >
                 Copy Meeting Link
@@ -133,7 +124,6 @@ export default function InboxPage() {
           </div>
 
           <div className="space-y-3 mt-4">
-
             <button
               onClick={async () => {
                 const permission = await Notification.requestPermission();
@@ -152,12 +142,8 @@ export default function InboxPage() {
               Leave Group
             </button>
           </div>
-
         </aside>
-
       </div>
-
-      <Footer />
-    </div>
+    </PageLayout>
   );
 }
