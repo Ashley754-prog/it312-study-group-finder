@@ -5,6 +5,7 @@ import ForgotPassword from "./pages/ForgotPassword.jsx";
 import PrivateRoute from "./components/PrivateRoute";
 import Dashboard from "./pages/Dashboard";
 import InboxPage from "./pages/InboxPage";
+import GroupChatPage from "./pages/GroupChatPage.jsx";
 import CreateGroupPage from "./pages/CreateGroupPage.jsx";
 import SchedulesPage from "./pages/SchedulesPage.jsx";
 import MyStudyGroupsPage from "./pages/MyStudyGroupsPage.jsx";
@@ -28,6 +29,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
         <Route path="/inbox" element={<InboxPage />} />
+        <Route path="/group-chat" element={<GroupChatPage />} />
         <Route path="/create-group" element={<CreateGroupPage />} />
         <Route path="/schedules" element={<SchedulesPage />} />
         <Route path="/my-study-groups" element={<MyStudyGroupsPage />} />
