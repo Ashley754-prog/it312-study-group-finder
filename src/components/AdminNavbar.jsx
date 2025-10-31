@@ -1,5 +1,4 @@
 import { Link, useNavigate } from "react-router-dom";
-import {ArrowRightStartOnRectangleIcon } from "@heroicons/react/24/outline";
 
 export default function AdminNavbar() {
   const navigate = useNavigate();
@@ -13,12 +12,7 @@ export default function AdminNavbar() {
     <header className="bg-maroon text-white py-4 shadow-md flex justify-between items-center px-6">
       <h1 className="text-xl font-bold">Admin Dashboard</h1>
 
-      <div className="flex items-center gap-4">
-        <Link to="/dashboard" className="flex items-center gap-2 hover:text-gold">
-          <ArrowRightStartOnRectangleIcon className="w-5 h-5" />
-          Back
-        </Link>
-
+      <div className="flex items-center">
         <button
           onClick={handleAdminLogout}
           className="bg-gold text-maroon px-3 py-1 rounded hover:brightness-110 font-semibold"

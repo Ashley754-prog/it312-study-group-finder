@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { UserCircleIcon, HomeIcon, InboxIcon, CalendarIcon, PlusCircleIcon, UsersIcon } from "@heroicons/react/24/solid";
+import { UserCircleIcon, HomeIcon, InboxIcon, CalendarIcon, ChatBubbleLeftRightIcon, UsersIcon } from "@heroicons/react/24/solid";
 import { getUser, logoutUser } from "../utils/auth";
 import { useState } from "react";
 
@@ -36,7 +36,7 @@ export default function Navbar() {
         <nav className="flex gap-6 text-sm font-medium">
           {navItem("/dashboard", "Home", HomeIcon)}
           {navItem("/inbox", "Inbox", InboxIcon)}
-          {navItem("/create-group", "Create Group", PlusCircleIcon)}
+          {navItem("/group-chat", "Group Chat", ChatBubbleLeftRightIcon)}
           {navItem("/schedules", "Schedules", CalendarIcon)}
           {navItem("/my-study-groups", "My Study Groups", UsersIcon)}
         </nav>
