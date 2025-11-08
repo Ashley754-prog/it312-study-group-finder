@@ -1,15 +1,23 @@
-export function loginUser(username) {
-  localStorage.setItem("user", username);
-}
+export const loginUser = (user, token) => {
+  localStorage.setItem("user", JSON.stringify(user));
+  localStorage.setItem("token", token);
+};
 
-export function logoutUser() {
+export const logoutUser = () => {
   localStorage.removeItem("user");
-}
+  localStorage.removeItem("token");
+};
 
-export function getUser() {
-  return localStorage.getItem("user");
-}
+export const getToken = () => localStorage.getItem("token");
 
-export function isAuthenticated() {
-  return !!localStorage.getItem("user");
-}
+export const getUser = () => {
+  const user = localStorage.getItem("user");
+  return user ? JSON.parse(user) : null;
+};
+
+export const getUsername = () => {
+  const user = getUser();
+  return user?.username || "";
+};
+
+export const isAuthenticated = () => !!getToken();

@@ -1,94 +1,108 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { loginUser } from "../utils/auth";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { loginUser } from "../utils/auth";
+import { jwtDecode } from "jwt-decode"; 
 import { GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email.endsWith("@wmsu.edu.ph")) {
       alert("Please use your WMSU email (@wmsu.edu.ph).");
       return;
     }
 
     setLoading(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    setTimeout(() => {
-      const username = email.split("@")[0];
-      loginUser(username);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Login failed");
+
+      loginUser(
+        { username: data.user.username, email: data.user.email, id: data.user._id },
+        data.token
+      );
+
       navigate("/dashboard");
-    }, 1200);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoogleLogin = (credentialResponse) => {
-    const decoded = jwtDecode(credentialResponse.credential); 
-    console.log("Google user:", decoded);
-    loginUser(decoded.given_name || "GoogleUser");
-    navigate("/dashboard");
+    try {
+      const decoded = jwtDecode(credentialResponse.credential);
+      const userObj = {
+        username: decoded.given_name || decoded.name || "GoogleUser",
+        email: decoded.email,
+        id: decoded.sub,
+      };
+
+      loginUser(userObj, credentialResponse.credential);
+      navigate("/dashboard");
+    } catch (err) {
+      console.error("Google Login Error:", err);
+      alert("Google Login Failed");
+    }
   };
 
   return (
-    <div
-      className="flex items-center justify-center h-screen bg-cover bg-center"
-      style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}
-    >
+    <div className="flex items-center justify-center h-screen bg-cover bg-center" style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}>
       <div className="flex w-[900px] h-[550px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
-
         <div className="w-1/2 bg-maroon flex flex-col justify-center items-center text-white">
           <div className="flex gap-6 mb-4 relative -top-4">
-            <img
-              src="/wmsu-logo.jpg"
-              alt="WMSU Logo"
-              className="w-40 h-40 rounded-full object-cover"
-            />
-            <img
-              src="/study-squad-logo.png"
-              alt="Study Squad Logo"
-              className="w-40 h-40 rounded-full object-cover"
-            />
+            <img src="/wmsu-logo.jpg" alt="WMSU Logo" className="w-40 h-40 rounded-full object-cover" />
+            <img src="/study-squad-logo.png" alt="Study Squad Logo" className="w-40 h-40 rounded-full object-cover" />
           </div>
-
           <h1 className="text-3xl font-bold text-white">Crimsons Study Squad</h1>
         </div>
 
         <div className="w-1/2 flex flex-col justify-center items-center p-8">
-          <h2 className="text-3xl font-semibold mb-6 text-maroon">
-            Log in to your account
-          </h2>
+          <h2 className="text-3xl font-semibold mb-6 text-maroon">Log in to your account</h2>
 
-          <div className="w-72">
+          <div className="w-72 flex flex-col gap-3">
+
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email"
-              className="w-full mb-3 p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              className="w-full p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
             />
 
-            <div className="relative mb-2">
+            <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 className="w-full p-2 pr-10 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-maroon"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-maroon"
               >
                 {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
               </button>
             </div>
 
-            <p className="text-sm text-gray-600 text-right mb-3">
-              <Link to="/forgot-password" className="text-maroon hover:underline">
-                Forgot password?
+            <p className="text-right text-sm">
+              <Link to="/forgot-password" className="text-maroon font-semibold hover:underline">
+                Forgot Password?
               </Link>
             </p>
 
@@ -99,22 +113,19 @@ export default function LoginPage() {
             >
               {loading ? "Logging in..." : "Login"}
             </button>
-          </div>
 
-          <div className="my-4">
-            <p className="text-sm text-gray-500 mb-2 text-center">or</p>
             <GoogleLogin
               onSuccess={handleGoogleLogin}
               onError={() => console.log("Google Login Failed")}
             />
-          </div>
 
-          <p className="mt-4 text-sm text-gray-600">
-            Don’t have an account?{" "}
-            <Link to="/" className="text-maroon font-semibold hover:underline">
-              Create account here
-            </Link>
-          </p>
+            <p className="mt-4 text-sm text-gray-600 text-center">
+              Don’t have an account?{" "}
+              <Link to="/" className="text-maroon font-semibold hover:underline">
+                Create account here
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>

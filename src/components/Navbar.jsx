@@ -1,13 +1,14 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserCircleIcon, HomeIcon, InboxIcon, CalendarIcon, ChatBubbleLeftRightIcon, UsersIcon } from "@heroicons/react/24/solid";
-import { getUser, logoutUser } from "../utils/auth";
+import { getUsername, logoutUser } from "../utils/auth";
 import { useState } from "react";
 
 export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const username = getUser();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const username = getUsername() || "Guest"; 
   const profilePic = null; 
 
   const handleLogout = () => {
@@ -18,7 +19,9 @@ export default function Navbar() {
   const navItem = (path, label, Icon) => (
     <Link
       to={path}
-      className={`flex items-center gap-1 ${location.pathname === path ? "text-gold font-semibold" : "text-white hover:text-gold"}`}
+      className={`flex items-center gap-1 ${
+        location.pathname === path ? "text-gold font-semibold" : "text-white hover:text-gold"
+      }`}
     >
       <Icon className="w-5 h-5" />
       <span className="hidden sm:block">{label}</span>
@@ -64,7 +67,7 @@ export default function Navbar() {
                 }}
                 className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
               >
-                Account Customization
+                Account Settings
               </button>
 
               <button
