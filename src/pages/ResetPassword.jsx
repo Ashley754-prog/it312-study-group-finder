@@ -1,0 +1,113 @@
+import { useState } from "react";
+import { useNavigate, useParams, Link } from "react-router-dom";
+
+export default function ResetPassword() {
+  const navigate = useNavigate();
+  const { token } = useParams(); 
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match!");
+      return;
+    }
+
+    if (password.length < 8) {
+      alert("Password must be at least 8 characters.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const res = await fetch(`http://localhost:5000/api/password/reset-password/${token}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ password }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Reset failed");
+
+      setSuccess(true);
+      setTimeout(() => navigate("/login"), 3000);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div
+      className="flex items-center justify-center h-screen bg-cover bg-center"
+      style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}
+    >
+      <div className="flex w-[900px] h-[550px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
+        <div className="w-1/2 bg-maroon flex flex-col justify-center items-center text-white">
+          <div className="flex gap-6 mb-4 relative -top-4">
+            <img
+              src="/wmsu-logo.jpg"
+              alt="WMSU Logo"
+              className="w-40 h-40 rounded-full object-cover"
+            />
+            <img
+              src="/study-squad-logo.png"
+              alt="Study Squad Logo"
+              className="w-40 h-40 rounded-full object-cover"
+            />
+          </div>
+
+          <h1 className="text-3xl font-bold text-white">Crimsons Study Squad</h1>
+        </div>
+
+        <div className="w-1/2 flex flex-col justify-center items-center px-8">
+          <h2 className="text-2xl font-bold text-maroon mb-3">Reset your password</h2>
+
+          {!success ? (
+            <form onSubmit={handleResetPassword} className="w-72 flex flex-col">
+              <input
+                type="password"
+                placeholder="New Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="mb-3 p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              />
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="mb-4 p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              />
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="bg-maroon text-white py-2 rounded hover:brightness-90"
+              >
+                {loading ? "Resetting..." : "Reset Password"}
+              </button>
+
+              <p className="text-sm mt-4 text-gray-600 text-center">
+                Back to{" "}
+                <Link to="/login" className="text-maroon font-medium hover:underline">
+                  Login
+                </Link>
+              </p>
+            </form>
+          ) : (
+            <p className="text-green-800 font-semibold text-center mt-6">
+              Password reset successful!<br />Redirecting to login...
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

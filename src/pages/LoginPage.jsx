@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
 import { loginUser } from "../utils/auth";
-import { jwtDecode } from "jwt-decode"; 
 import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
@@ -42,25 +41,34 @@ export default function LoginPage() {
     }
   };
 
-  const handleGoogleLogin = (credentialResponse) => {
+  const handleGoogleLogin = async (credentialResponse) => {
     try {
-      const decoded = jwtDecode(credentialResponse.credential);
-      const userObj = {
-        username: decoded.given_name || decoded.name || "GoogleUser",
-        email: decoded.email,
-        id: decoded.sub,
-      };
+      const res = await fetch("http://localhost:5000/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ idToken: credentialResponse.credential }),
+      });
 
-      loginUser(userObj, credentialResponse.credential);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Google Login failed");
+
+      loginUser(
+        { username: data.user.username, email: data.user.email, id: data.user._id },
+        data.token
+      );
+
       navigate("/dashboard");
     } catch (err) {
       console.error("Google Login Error:", err);
-      alert("Google Login Failed");
+      alert("Google Sign-In failed. Please try again.");
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-cover bg-center" style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}>
+    <div
+      className="flex items-center justify-center h-screen bg-cover bg-center"
+      style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}
+    >
       <div className="flex w-[900px] h-[550px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
         <div className="w-1/2 bg-maroon flex flex-col justify-center items-center text-white">
           <div className="flex gap-6 mb-4 relative -top-4">
@@ -74,7 +82,6 @@ export default function LoginPage() {
           <h2 className="text-3xl font-semibold mb-6 text-maroon">Log in to your account</h2>
 
           <div className="w-72 flex flex-col gap-3">
-
             <input
               type="email"
               value={email}
@@ -114,10 +121,14 @@ export default function LoginPage() {
               {loading ? "Logging in..." : "Login"}
             </button>
 
-            <GoogleLogin
-              onSuccess={handleGoogleLogin}
-              onError={() => console.log("Google Login Failed")}
-            />
+            <p className="text-gray-900 text-sm font-normal text-center">or</p>
+
+            <div className="flex justify-center mt-3">
+              <GoogleLogin
+                onSuccess={handleGoogleLogin}
+                onError={() => alert("Google Login Failed")}
+              />
+            </div>
 
             <p className="mt-4 text-sm text-gray-600 text-center">
               Don’t have an account?{" "}

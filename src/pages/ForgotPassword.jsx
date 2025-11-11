@@ -7,22 +7,34 @@ export default function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleReset = (e) => {
+  const handleReset = async (e) => {
     e.preventDefault();
 
-    if (!email.endsWith("@wmsu.edu.ph")) {
-      alert("Enter a valid WMSU email (@wmsu.edu.ph)");
+    if (!email.endsWith("@wmsu.edu.ph") && !email.endsWith("@gmail.com")) {
+      alert("Enter your WMSU email address or Gmail address.");
       return;
     }
 
     setLoading(true);
 
-    setTimeout(() => {
-      setLoading(false);
-      setSuccess(true);
+    try {
+      const res = await fetch("http://localhost:5000/api/password/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
 
-      setTimeout(() => navigate("/"), 3000);
-    }, 1500);
+      const data = await res.json();
+
+      if (!res.ok) throw new Error(data.message || "Failed to send reset link");
+
+      setSuccess(true);
+      setTimeout(() => navigate("/login"), 3000);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -44,7 +56,6 @@ export default function ForgotPassword() {
               className="w-40 h-40 rounded-full object-cover"
             />
           </div>
-
           <h1 className="text-3xl font-bold text-white">Crimsons Study Squad</h1>
         </div>
 
@@ -54,14 +65,14 @@ export default function ForgotPassword() {
           {!success ? (
             <>
               <p className="text-center text-gray-700 mb-6">
-                Enter your registered <span className="font-semibold">WMSU email</span> and we’ll send
+                Enter your registered <span className="font-semibold">WMSU email or Gmail address</span> and we’ll send
                 a reset link.
               </p>
 
               <form onSubmit={handleReset} className="w-72 flex flex-col">
                 <input
                   type="email"
-                  placeholder="WMSU Email"
+                  placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="mb-4 p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
@@ -84,8 +95,8 @@ export default function ForgotPassword() {
               </form>
             </>
           ) : (
-            <p className="text-green-700 font-semibold text-center mt-6">
-              Password reset link sent!<br />Check your WMSU email<br />
+            <p className="text-green-800 font-semibold text-center mt-6">
+              Password reset link sent!<br />Check your email<br />
               Redirecting to login...
             </p>
           )}
