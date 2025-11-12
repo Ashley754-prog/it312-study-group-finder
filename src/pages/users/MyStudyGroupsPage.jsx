@@ -1,5 +1,9 @@
-import PageLayout from "../components/PageLayout";
-import { UserGroupIcon, VideoCameraIcon, ChatBubbleLeftEllipsisIcon, UserPlusIcon } from "@heroicons/react/24/outline";
+import { 
+  UserGroupIcon, 
+  VideoCameraIcon, 
+  ChatBubbleLeftEllipsisIcon, 
+  UserPlusIcon } 
+from "@heroicons/react/24/outline";
 
 export default function MyStudyGroupsPage() {
   const studyGroups = [
@@ -10,8 +14,7 @@ export default function MyStudyGroupsPage() {
   ];
 
   return (
-    <PageLayout>
-      <div className="flex h-[calc(100vh-200px)] max-w-7xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden">
+      <div className="flex h-[calc(100vh-200px)] max-w-7xl mx-auto bg-white border border-gray-300 shadow-xl rounded-xl overflow-hidden">
         <div className="flex-1 flex flex-col p-8 overflow-y-auto">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-2xl font-bold text-maroon flex items-center gap-2">
@@ -67,6 +70,5 @@ export default function MyStudyGroupsPage() {
           </div>
         </div>
       </div>
-    </PageLayout>
   );
 }

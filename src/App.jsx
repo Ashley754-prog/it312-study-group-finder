@@ -1,51 +1,68 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import LoginPage from "./pages/LoginPage.jsx";
-import CreateAccount from "./pages/CreateAccount.jsx";
-import ForgotPassword from "./pages/ForgotPassword.jsx";
-import ResetPassword from "./pages/ResetPassword.jsx";
-import PrivateRoute from "./components/PrivateRoute";
-import Dashboard from "./pages/Dashboard";
-import InboxPage from "./pages/InboxPage";
-import GroupChatPage from "./pages/GroupChatPage.jsx";
-import CreateGroupPage from "./pages/CreateGroupPage.jsx";
-import SchedulesPage from "./pages/SchedulesPage.jsx";
-import MyStudyGroupsPage from "./pages/MyStudyGroupsPage.jsx";
-import ProfilePage from "./pages/ProfilePage.jsx";
-import AboutPage from "./pages/AboutPage";
-import ContactsPage from "./pages/ContactsPage";
-import TermsPage from "./pages/TermsPage";
-import PoliciesPage from "./pages/PoliciesPage";
-import AdminLogin from "./pages/admin/AdminLogin.jsx";
+import LoginPage from "./pages/auth/LoginPage.jsx";
+import CreateAccount from "./pages/auth/CreateAccount.jsx";
+import ForgotPassword from "./pages/auth/ForgotPassword.jsx";
+import ResetPassword from "./pages/auth/ResetPassword.jsx";
+
+import Dashboard from "./pages/users/UserDashboard.jsx";
+import InboxPage from "./pages/users/InboxPage.jsx";
+import GroupChatPage from "./pages/users/GroupChatPage.jsx";
+import CreateGroupPage from "./pages/users/CreateGroupPage.jsx";
+import SchedulesPage from "./pages/users/SchedulesPage.jsx";
+import MyStudyGroupsPage from "./pages/users/MyStudyGroupsPage.jsx";
+import ProfilePage from "./pages/users/ProfilePage.jsx";
+import AboutPage from "./pages/users/AboutPage.jsx";
+import ContactsPage from "./pages/users/ContactsPage.jsx";
+import TermsPage from "./pages/users/TermsPage.jsx";
+import PoliciesPage from "./pages/users/PoliciesPage.jsx";
+
 import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 import ManageUsers from "./pages/admin/ManageUsers.jsx";
 import ManageGroups from "./pages/admin/ManageGroups.jsx";
 import Reports from "./pages/admin/Reports.jsx";
+import AdminSettings from "./pages/admin/Settings.jsx";
+
+import AdminLayout from "./layouts/AdminLayout.jsx";
+import PageLayout from "./layouts/PageLayout.jsx";
+
+import AdminPrivateRoute from "./routes/AdminPrivateRoute.jsx";
 
 function App() {
   return (
     <Router>
       <Routes>
+        {/* Auth pages */}
         <Route path="/" element={<CreateAccount />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
-        <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-        <Route path="/inbox" element={<InboxPage />} />
-        <Route path="/group-chat" element={<GroupChatPage />} />
-        <Route path="/create-group" element={<CreateGroupPage />} />
-        <Route path="/schedules" element={<SchedulesPage />} />
-        <Route path="/my-study-groups" element={<MyStudyGroupsPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/about" element={<AboutPage />} />
-        <Route path="/contacts" element={<ContactsPage />} />
-        <Route path="/terms" element={<TermsPage />} />
-        <Route path="/policies" element={<PoliciesPage />} />
 
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/manage-users" element={<ManageUsers />} />
-        <Route path="/admin/manage-groups" element={<ManageGroups />} />
-        <Route path="/admin/reports" element={<Reports />} />
+        {/* User pages inside PageLayout */}
+        <Route element={<PageLayout />}>
+          <Route path="/user-dashboard" element={<Dashboard />} />
+          <Route path="/inbox" element={<InboxPage />} />
+          <Route path="/group-chat" element={<GroupChatPage />} />
+          <Route path="/create-group" element={<CreateGroupPage />} />
+          <Route path="/schedules" element={<SchedulesPage />} />
+          <Route path="/my-study-groups" element={<MyStudyGroupsPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contacts" element={<ContactsPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/policies" element={<PoliciesPage />} />
+        </Route>
+
+        {/* Admin pages */}
+        <Route path="/admin" element={<AdminLayout />}>
+          {/* AdminPrivateRoute wraps all admin pages */}
+          <Route element={<AdminPrivateRoute />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="manage-users" element={<ManageUsers />} />
+            <Route path="manage-groups" element={<ManageGroups />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="settings" element={<AdminSettings />} />
+          </Route>
+        </Route>
       </Routes>
     </Router>
   );

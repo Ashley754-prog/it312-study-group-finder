@@ -6,7 +6,7 @@ export default function Footer() {
   const footerLink = (path, label) => (
     <Link
       to={path}
-      className={`${location.pathname === path ? "text-gold font-semibold" : "text-white hover:text-gold"}`}
+      className={`${location.pathname === path ? "text-gold" : "text-white hover:text-gold"}`}
     >
       {label}
     </Link>

@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
-import { loginUser } from "../utils/auth";
+import { loginUser } from "../../utils/auth";
 import { GoogleLogin } from "@react-oauth/google";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +20,15 @@ export default function CreateAccount() {
   const handleCreate = async (e) => {
     e.preventDefault();
 
-    if (!username || !email || !password || !confirmPassword) {
+    if (
+      !firstName ||
+      !middleName ||
+      !lastName ||
+      !username ||
+      !email ||
+      !password ||
+      !confirmPassword
+    ) {
       alert("Please fill out all fields!");
       return;
     }
@@ -38,7 +49,14 @@ export default function CreateAccount() {
       const res = await fetch("http://localhost:5000/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, email, password }),
+        body: JSON.stringify({
+          firstName,
+          middleName,
+          lastName,
+          username,
+          email,
+          password,
+        }),
       });
 
       const data = await res.json();
@@ -50,7 +68,7 @@ export default function CreateAccount() {
       );
 
       alert("Account created successfully!");
-      navigate("/dashboard");
+      navigate("/user-dashboard");
     } catch (err) {
       alert(err.message);
     } finally {
@@ -86,7 +104,7 @@ export default function CreateAccount() {
       className="flex items-center justify-center h-screen bg-cover bg-center"
       style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}
     >
-      <div className="flex w-[900px] h-[550px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
+      <div className="flex w-[900px] h-[660px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
         <div className="w-1/2 bg-maroon flex flex-col justify-center items-center text-white">
           <div className="flex gap-6 mb-4 relative -top-4">
             <img src="/wmsu-logo.jpg" alt="WMSU Logo" className="w-40 h-40 rounded-full object-cover" />
@@ -103,10 +121,38 @@ export default function CreateAccount() {
           <form onSubmit={handleCreate} className="w-72 flex flex-col gap-3">
             <input
               type="text"
+              placeholder="First Name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              required
+            />
+
+            <input
+              type="text"
+              placeholder="Middle Name"
+              value={middleName}
+              onChange={(e) => setMiddleName(e.target.value)}
+              className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              required
+            />
+
+            <input
+              type="text"
+              placeholder="Last Name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              required
+            />
+
+            <input
+              type="text"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              required
             />
 
             <input
@@ -115,6 +161,7 @@ export default function CreateAccount() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              required
             />
 
             <div className="relative">
@@ -124,6 +171,7 @@ export default function CreateAccount() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-2 pr-10 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+                required
               />
               <button
                 type="button"
@@ -141,6 +189,7 @@ export default function CreateAccount() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full p-2 pr-10 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+                required
               />
               <button
                 type="button"

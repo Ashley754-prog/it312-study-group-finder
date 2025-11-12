@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
-import { loginUser } from "../utils/auth";
+import { loginUser } from "../../utils/auth";
 import { GoogleLogin } from "@react-oauth/google";
 
 export default function LoginPage() {
@@ -33,7 +33,7 @@ export default function LoginPage() {
         data.token
       );
 
-      navigate("/dashboard");
+      navigate("/user-dashboard");
     } catch (err) {
       alert(err.message);
     } finally {
@@ -69,7 +69,7 @@ export default function LoginPage() {
       className="flex items-center justify-center h-screen bg-cover bg-center"
       style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}
     >
-      <div className="flex w-[900px] h-[550px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
+      <div className="flex w-[900px] h-[660px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
         <div className="w-1/2 bg-maroon flex flex-col justify-center items-center text-white">
           <div className="flex gap-6 mb-4 relative -top-4">
             <img src="/wmsu-logo.jpg" alt="WMSU Logo" className="w-40 h-40 rounded-full object-cover" />
@@ -78,7 +78,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-white">Crimsons Study Squad</h1>
         </div>
 
-        <div className="w-1/2 flex flex-col justify-center items-center p-8">
+        <div className="w-1/2 flex flex-col justify-center items-center p-10">
           <h2 className="text-3xl font-semibold mb-6 text-maroon">Log in to your account</h2>
 
           <div className="w-72 flex flex-col gap-3">
@@ -116,12 +116,12 @@ export default function LoginPage() {
             <button
               onClick={handleLogin}
               disabled={loading}
-              className="w-full bg-maroon text-white font-medium py-2 rounded hover:brightness-90"
+              className="w-full mt-5 bg-maroon text-white font-medium py-2 rounded hover:brightness-90"
             >
               {loading ? "Logging in..." : "Login"}
             </button>
 
-            <p className="text-gray-900 text-sm font-normal text-center">or</p>
+            <p className="text-gray-900 text-sm font-normal text-center mt-3">or</p>
 
             <div className="flex justify-center mt-3">
               <GoogleLogin

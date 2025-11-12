@@ -1,8 +1,5 @@
-import PageLayout from "../components/PageLayout";
-
 export default function CreateGroupPage() {
   return (
-    <PageLayout>
       <div className="flex h-[calc(100vh-200px)] max-w-4xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden text-maroon">
         <div className="flex-1 p-10 flex flex-col overflow-y-auto">
           <h1 className="text-3xl font-bold mb-6">Create a Study Group</h1>
@@ -56,6 +53,5 @@ export default function CreateGroupPage() {
           </form>
         </div>
       </div>
-    </PageLayout>
   );
 }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import PageLayout from "../components/PageLayout";
 import {
   CalendarDaysIcon,
   PlusIcon,
@@ -50,8 +49,7 @@ export default function SchedulesPage() {
   const daysInMonth = new Date(year, currentDate.getMonth() + 1, 0).getDate();
 
   return (
-    <PageLayout>
-      <div className="flex h-[calc(100vh-200px)] max-w-7xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden relative">
+      <div className="flex h-[calc(100vh-200px)] max-w-7xl mx-auto bg-white border border-gray-300 shadow-xl rounded-xl overflow-hidden relative">
         <div className="flex-1 border-r border-gray-300 flex flex-col overflow-hidden">
           <div className="flex justify-between items-center px-8 pt-8 pb-4 border-b border-gray-200">
             <div className="flex items-center gap-2">
@@ -195,6 +193,5 @@ export default function SchedulesPage() {
           </div>
         )}
       </div>
-    </PageLayout>
   );
 }

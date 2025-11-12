@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { UserCircleIcon, HomeIcon, InboxIcon, CalendarIcon, ChatBubbleLeftRightIcon, UsersIcon } from "@heroicons/react/24/solid";
-import { getUsername, logoutUser } from "../utils/auth";
+import { getUsername, logoutUser } from "../../utils/auth";
 import { useState } from "react";
 
 export default function Navbar() {
@@ -37,7 +37,7 @@ export default function Navbar() {
         </div>
 
         <nav className="flex gap-6 text-sm font-medium">
-          {navItem("/dashboard", "Home", HomeIcon)}
+          {navItem("/user-dashboard", "Home", HomeIcon)}
           {navItem("/inbox", "Inbox", InboxIcon)}
           {navItem("/group-chat", "Group Chat", ChatBubbleLeftRightIcon)}
           {navItem("/schedules", "Schedules", CalendarIcon)}
@@ -68,13 +68,6 @@ export default function Navbar() {
                 className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded"
               >
                 Account Settings
-              </button>
-
-              <button
-                onClick={() => navigate("/admin/login")}
-                className="block w-full text-left px-3 py-2 hover:bg-gray-100 rounded text-red-700"
-              >
-                Admin Dashboard
               </button>
 
               <button

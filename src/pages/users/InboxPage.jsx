@@ -4,7 +4,6 @@ import {
   FunnelIcon,
   Squares2X2Icon,
 } from "@heroicons/react/24/outline";
-import PageLayout from "../components/PageLayout";
 
 export default function InboxPage() {
   const [messages] = useState([
@@ -22,7 +21,6 @@ export default function InboxPage() {
   ]);
 
   return (
-    <PageLayout>
       <div className="flex h-[calc(100vh-200px)] max-w-7xl mx-auto bg-white shadow-xl rounded-xl border border-gray-300 overflow-hidden">
         <aside className="w-64 bg-maroon text-white p-4 flex flex-col">
           <h2 className="font-bold text-lg mb-4 flex items-center gap-2">
@@ -37,7 +35,7 @@ export default function InboxPage() {
           </nav>
         </aside>
 
-        <main className="flex-1 flex flex-col bg-white">
+        <main className="flex-1 flex flex-col bg-white border border-gray-300">
           <div className="flex items-center justify-between p-4 border-b bg-gray-50">
             <div className="flex items-center gap-2 flex-1">
               <input
@@ -80,6 +78,5 @@ export default function InboxPage() {
           </div>
         </main>
       </div>
-    </PageLayout>
   );
 }
