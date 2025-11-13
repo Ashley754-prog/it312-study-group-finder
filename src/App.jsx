@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/auth/LoginPage.jsx";
 import CreateAccount from "./pages/auth/CreateAccount.jsx";
+import VerificationPage from "./pages/auth/VerificationPage.jsx";
 import ForgotPassword from "./pages/auth/ForgotPassword.jsx";
 import ResetPassword from "./pages/auth/ResetPassword.jsx";
 
@@ -31,13 +32,12 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Auth pages */}
         <Route path="/" element={<CreateAccount />} />
+        <Route path="/verify" element={<VerificationPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-        {/* User pages inside PageLayout */}
         <Route element={<PageLayout />}>
           <Route path="/user-dashboard" element={<Dashboard />} />
           <Route path="/inbox" element={<InboxPage />} />
@@ -52,9 +52,7 @@ function App() {
           <Route path="/policies" element={<PoliciesPage />} />
         </Route>
 
-        {/* Admin pages */}
         <Route path="/admin" element={<AdminLayout />}>
-          {/* AdminPrivateRoute wraps all admin pages */}
           <Route element={<AdminPrivateRoute />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="manage-users" element={<ManageUsers />} />

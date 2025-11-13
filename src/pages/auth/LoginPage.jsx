@@ -57,7 +57,7 @@ export default function LoginPage() {
         data.token
       );
 
-      navigate("/dashboard");
+      navigate("/user-dashboard");
     } catch (err) {
       console.error("Google Login Error:", err);
       alert("Google Sign-In failed. Please try again.");
@@ -69,7 +69,7 @@ export default function LoginPage() {
       className="flex items-center justify-center h-screen bg-cover bg-center"
       style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}
     >
-      <div className="flex w-[900px] h-[660px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
+      <div className="flex w-[900px] h-[600px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
         <div className="w-1/2 bg-maroon flex flex-col justify-center items-center text-white">
           <div className="flex gap-6 mb-4 relative -top-4">
             <img src="/wmsu-logo.jpg" alt="WMSU Logo" className="w-40 h-40 rounded-full object-cover" />

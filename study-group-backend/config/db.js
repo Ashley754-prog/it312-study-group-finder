@@ -1,16 +1,19 @@
-import mongoose from "mongoose";
+import mysql from "mysql2/promise";
+import dotenv from "dotenv";
+dotenv.config();
 
-const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (error) {
-    console.error(`Error: ${error.message}`);
-    process.exit(1);
-  }
-};
+export const pool = mysql.createPool({
+  host: "127.0.0.1",      
+  user: "root",            
+  password: "",             
+  database: "study_group",  
+  port: 3307,               
+});
 
-export default connectDB;
+try {
+  const connection = await pool.getConnection();
+  console.log("✅ Connected to MySQL database!");
+  connection.release();
+} catch (err) {
+  console.error("❌ Database connection failed:", err.message);
+}

@@ -1,97 +1,107 @@
-import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { OAuth2Client } from "google-auth-library";
+import { pool } from "../config/db.js";
+import { sendEmail } from "../utils/sendEmail.js"; 
+import { isAllowedWMSUEmail } from "../utils/validateWMSUEmail.js";
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
-const generateToken = (userId) => {
-  return jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "1h" });
-};
+const generateToken = (userId) =>
+  jwt.sign({ id: userId }, process.env.JWT_SECRET, { expiresIn: "1h" });
 
 export const createAccount = async (req, res) => {
   try {
-    const { username, email, password } = req.body;
+    console.log("Incoming data:", req.body);
+    const { first_name, middle_name, last_name, username, email, password } = req.body;
 
-    const existingUser = await User.findOne({ email });
-    if (existingUser) return res.status(400).json({ message: "User already exists" });
+    const [existingUser] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
+    if (existingUser.length > 0) {
+      return res.status(400).json({ message: "User already exists" });
+    }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({ username, email, password: hashedPassword });
-    await newUser.save();
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    const token = generateToken(newUser._id);
+    await pool.query(
+      "INSERT INTO users (first_name, middle_name, last_name, username, email, password, is_verified, verification_code) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      [first_name, middle_name, last_name, username, email, hashedPassword, false, verificationCode]
+    );
 
-    res.status(201).json({
-      message: "User registered successfully",
-      token,
-      user: { id: newUser._id, username: newUser.username, email: newUser.email },
+    console.log("✅ User inserted. Sending verification email to:", email);
+
+    const verificationLink = `http://localhost:5173/verify?email=${email}`;
+    await sendEmail(
+      email,
+      "Verify your Crimsons Study Squad Account",
+      `
+      <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+        <h2 style="color: #800000;">Crimsons Study Squad</h2>
+        <p>Hi ${first_name},</p>
+        <p>Thank you for registering! Please verify your account using the code below:</p>
+        <h3 style="background: #f4f4f4; padding: 10px; display: inline-block;">${verificationCode}</h3>
+        <p>or click the link below to verify your account:</p>
+        <a href="${verificationLink}" style="color: #800000; text-decoration: underline; font-weight: bold;">Verify Account</a>
+        <p>If you didn’t request this, you can safely ignore this email.</p>
+        <br/>
+        <p>– Crimsons Study Squad Team</p>
+      </div>
+      `
+    );
+
+    return res.status(201).json({
+      message: "Account created successfully! Please check your WMSU email for the verification code.",
     });
-  } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
+  } catch (error) {
+    console.error("Error during createAccount:", error);
+    return res.status(500).json({ message: "Server error", error: error.message });
   }
 };
+
 
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid credentials" });
+    const [users] = await pool.query("SELECT * FROM users WHERE email = ?", [email]);
+    if (users.length === 0) return res.status(400).json({ message: "Invalid credentials" });
+
+    const user = users[0];
     if (!user.password) return res.status(400).json({ message: "Use Google Sign-In" });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-    const token = generateToken(user._id);
+    if (!user.is_verified) return res.status(400).json({ message: "Account not verified" });
 
-    res.status(200).json({
-      token,
-      user: { id: user._id, username: user.username, email: user.email },
-    });
+    const token = generateToken(user.id);
+    res.status(200).json({ token, user: { id: user.id, username: user.username, email: user.email } });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Server error", error: err.message });
   }
 };
 
-export const googleAuth = async (req, res) => {
+export const verifyAccount = async (req, res) => {
   try {
-    const { idToken } = req.body;
+    const { email, code } = req.body;
+    const [users] = await pool.query(
+      "SELECT * FROM users WHERE email = ? AND verification_code = ?",
+      [email, code]
+    );
+    if (users.length === 0) return res.status(400).json({ message: "Invalid verification code" });
 
-    if (!idToken) return res.status(400).json({ message: "No ID token provided" });
-
-    const ticket = await client.verifyIdToken({
-      idToken,
-      audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const payload = ticket.getPayload();
-    console.log("Google payload:", payload);
-
-    const email = payload.email;
-    const username = payload.name || email.split("@")[0]; 
-    const googleId = payload.sub;
-
-    if (!email) return res.status(400).json({ message: "Google account has no email" });
-
-    let user = await User.findOne({ email });
-    if (!user) {
-      user = new User({ username, email, googleId });
-      await user.save();
+    if (!isAllowedWMSUEmail(email)) {
+      return res.status(400).json({ message: "WMSU email not allowed (outside 5-year limit)" });
     }
 
-    const token = generateToken(user._id);
+    await pool.query(
+      "UPDATE users SET is_verified = true, verification_code = NULL WHERE id = ?",
+      [users[0].id]
+    );
 
-    res.status(200).json({
-      token,
-      user: { id: user._id, username: user.username, email: user.email },
-    });
+    res.status(200).json({ message: "Account verified successfully" });
   } catch (err) {
-    console.error("Google Auth Error:", err);
-    res.status(500).json({ message: "Google authentication failed", error: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Server error", error: err.message });
   }
 };
-
 

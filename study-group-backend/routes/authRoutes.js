@@ -1,11 +1,10 @@
 import express from 'express';
-import { createAccount, login, googleAuth } from '../controllers/authController.js';
+import { createAccount, login, verifyAccount } from '../controllers/authController.js';
 
 const router = express.Router();
 
 router.post('/', createAccount);
 router.post('/login', login);
-
-router.post('/google', googleAuth);
+router.post('/verify', verifyAccount);
 
 export default router;

@@ -1,34 +1,33 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
-import { loginUser } from "../../utils/auth";
 import { GoogleLogin } from "@react-oauth/google";
 
 export default function CreateAccount() {
   const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    first_name: "",
+    middle_name: "",
+    last_name: "",
+    username: "",
+    email: "",
+    password: "",
+    confirm_password: "",
+  });
   const [loading, setLoading] = useState(false);
-  const [firstName, setFirstName] = useState("");
-  const [middleName, setMiddleName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [username, setUsername] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleCreate = async (e) => {
     e.preventDefault();
 
-    if (
-      !firstName ||
-      !middleName ||
-      !lastName ||
-      !username ||
-      !email ||
-      !password ||
-      !confirmPassword
-    ) {
+    // Validate fields
+    const { first_name, middle_name, last_name, username, email, password, confirm_password } = formData;
+    if (!first_name || !middle_name || !last_name || !username || !email || !password || !confirm_password) {
       alert("Please fill out all fields!");
       return;
     }
@@ -38,7 +37,7 @@ export default function CreateAccount() {
       return;
     }
 
-    if (password !== confirmPassword) {
+    if (password !== confirm_password) {
       alert("Passwords do not match!");
       return;
     }
@@ -49,26 +48,14 @@ export default function CreateAccount() {
       const res = await fetch("http://localhost:5000/api/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          firstName,
-          middleName,
-          lastName,
-          username,
-          email,
-          password,
-        }),
+        body: JSON.stringify({ first_name, middle_name, last_name, username, email, password }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Failed to register");
 
-      loginUser(
-        { username: data.user.username, email: data.user.email, id: data.user._id },
-        data.token
-      );
-
-      alert("Account created successfully!");
-      navigate("/user-dashboard");
+      alert("✅ Account created successfully! Check your WMSU email for the verification code.");
+      navigate("/verify?email=" + encodeURIComponent(email));
     } catch (err) {
       alert(err.message);
     } finally {
@@ -77,6 +64,7 @@ export default function CreateAccount() {
   };
 
   const handleGoogleSignUp = async (credentialResponse) => {
+    setLoading(true);
     try {
       const res = await fetch("http://localhost:5000/api/auth/google", {
         method: "POST",
@@ -87,15 +75,13 @@ export default function CreateAccount() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || "Google Sign-Up failed");
 
-      loginUser(
-        { username: data.user.username, email: data.user.email, id: data.user._id },
-        data.token
-      );
-
-      navigate("/dashboard");
+      alert("✅ Google account created! Check your WMSU email for verification.");
+      navigate("/verify?email=" + encodeURIComponent(data.user.email));
     } catch (err) {
       console.error("Google Sign-Up Error:", err);
-      alert("Google Sign-Up failed. Please try again.");
+      alert(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -104,7 +90,7 @@ export default function CreateAccount() {
       className="flex items-center justify-center h-screen bg-cover bg-center"
       style={{ backgroundImage: "url('/wmsu-bg-img.jpg')" }}
     >
-      <div className="flex w-[900px] h-[660px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
+      <div className="flex w-[900px] h-[600px] bg-white bg-opacity-95 shadow-2xl rounded-2xl overflow-hidden">
         <div className="w-1/2 bg-maroon flex flex-col justify-center items-center text-white">
           <div className="flex gap-6 mb-4 relative -top-4">
             <img src="/wmsu-logo.jpg" alt="WMSU Logo" className="w-40 h-40 rounded-full object-cover" />
@@ -113,70 +99,76 @@ export default function CreateAccount() {
           <h1 className="text-3xl font-bold text-white">Crimsons Study Squad</h1>
         </div>
 
-        <div className="w-1/2 flex flex-col justify-center items-center p-8">
-          <h2 className="text-2xl font-semibold mb-6 text-maroon text-center leading-snug">
+        <div className="w-1/2 flex flex-col justify-center items-center p-10 overflow-y-auto max-h-[700px]">
+          <h2 className="text-2xl font-semibold mb-6 text-maroon text-center leading-snug mt-30">
             Make your own account now!
           </h2>
 
           <form onSubmit={handleCreate} className="w-72 flex flex-col gap-3">
             <input
               type="text"
+              name="first_name"
               placeholder="First Name"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              value={formData.first_name}
+              onChange={handleChange}
               required
+              className="w-full p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
             />
 
             <input
               type="text"
+              name="middle_name"
               placeholder="Middle Name"
-              value={middleName}
-              onChange={(e) => setMiddleName(e.target.value)}
-              className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              value={formData.middle_name}
+              onChange={handleChange}
               required
+              className="w-full p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
             />
 
             <input
               type="text"
+              name="last_name"
               placeholder="Last Name"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              value={formData.last_name}
+              onChange={handleChange}
               required
+              className="w-full p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
             />
 
             <input
               type="text"
+              name="username"
               placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              value={formData.username}
+              onChange={handleChange}
               required
+              className="w-full p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
             />
 
             <input
               type="email"
-              placeholder="Email (WMSU only)"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+              name="email"
+              placeholder="WMSU Email"
+              value={formData.email}
+              onChange={handleChange}
               required
+              className="w-full p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
             />
 
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 pr-10 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+                value={formData.password}
+                onChange={handleChange}
                 required
+                className="w-full p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-2.5 text-maroon"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-maroon"
               >
                 {showPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
               </button>
@@ -185,16 +177,17 @@ export default function CreateAccount() {
             <div className="relative">
               <input
                 type={showConfirmPassword ? "text" : "password"}
+                name="confirm_password"
                 placeholder="Confirm Password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full p-2 pr-10 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
+                value={formData.confirm_password}
+                onChange={handleChange}
                 required
+                className="w-full p-2 rounded bg-gray-200 focus:ring-1 focus:ring-maroon"
               />
               <button
                 type="button"
                 onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-2.5 text-maroon"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-maroon"
               >
                 {showConfirmPassword ? <EyeSlashIcon className="w-5 h-5" /> : <EyeIcon className="w-5 h-5" />}
               </button>
@@ -203,7 +196,7 @@ export default function CreateAccount() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-maroon text-white font-medium py-2 rounded hover:brightness-90"
+              className="w-full mt-5 bg-maroon text-white font-medium py-2 rounded hover:brightness-90"
             >
               {loading ? "Creating..." : "Create Account"}
             </button>

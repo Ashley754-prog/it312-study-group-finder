@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 dotenv.config();
-import { sendEmail } from "./utils/sendEmail.js";
+import { sendEmail } from "../utils/sendEmail.js";
 
 const test = async () => {
   try {
